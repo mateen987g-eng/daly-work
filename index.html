@@ -1,227 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Record Manager</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecordFlow — Professional Daily Record Manager</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>📝 Daily Record Manager</h1>
-            <p class="subtitle">Track your daily activities and progress</p>
-        </header>
-
-        <div class="main-content">
-            <!-- Add Record Form -->
-            <section class="form-section">
-                <h2>Add New Record</h2>
-                <form id="recordForm">
-                    <div class="form-group">
-                        <label for="date">Date:</label>
-                        <input type="date" id="date" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="title">Title:</label>
-                        <input type="text" id="title" placeholder="Enter record title" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="category">Category:</label>
-                        <select id="category" required>
-                            <option value="">Select category</option>
-                            <option value="work">Work</option>
-                            <option value="personal">Personal</option>
-                            <option value="health">Health</option>
-                            <option value="learning">Learning</option>
-                            <option value="project">Project</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="description">Description:</label>
-                        <textarea id="description" rows="4" placeholder="Enter detailed description..." required></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="status">Status:</label>
-                        <select id="status" required>
-                            <option value="pending">Pending</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Add Record</button>
-                        <button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
-                    </div>
-                </form>
-            </section>
-
-            <!-- Records Display -->
-            <section class="records-section">
-                <div class="section-header">
-                    <h2>Your Records</h2>
-                    <div class="storage-info">
-                        <span id="storageStatus">💾 Storage: Browser + PC Backup</span>
-                        <button class="btn btn-small btn-primary" id="storageSettingsBtn">⚙️ Storage Settings</button>
-                        <button class="btn btn-small btn-success" id="saveToPCBtn">💾 Save to PC Now</button>
-                    </div>
-                    <div class="filter-controls">
-                        <select id="filterCategory">
-                            <option value="">All Categories</option>
-                            <option value="work">Work</option>
-                            <option value="personal">Personal</option>
-                            <option value="health">Health</option>
-                            <option value="learning">Learning</option>
-                            <option value="project">Project</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <select id="filterStatus">
-                            <option value="">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                        <button class="btn btn-small btn-success" id="exportBtn">📥 Export Data</button>
-                        <button class="btn btn-small btn-primary" id="importBtn">📤 Import Data</button>
-                        <input type="file" id="importFile" accept=".json" style="display: none;">
-                        <button class="btn btn-small" id="clearAllBtn">Clear All</button>
-                    </div>
-                </div>
-                
-                <div id="recordsList" class="records-list">
-                    <p class="empty-message">No records yet. Add your first record above!</p>
-                </div>
-            </section>
-        </div>
+<body class="landing-page">
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="brand-icon">📊</span>
+        <span class="brand-name">RecordFlow</span>
+      </div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="login.html" class="btn-nav-secondary">Login</a>
+        <a href="signup.html" class="btn-nav-primary">Get Started</a>
+      </div>
     </div>
+  </nav>
 
-    <!-- Storage Settings Modal -->
-    <div id="storageModal" class="modal">
-        <div class="modal-content">
-            <span class="close-storage">&times;</span>
-            <h2>⚙️ Storage Settings</h2>
-            <div class="settings-content">
-                <div class="setting-group">
-                    <h3>Storage Preference</h3>
-                    <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" name="storagePreference" value="browser" id="storageBrowser">
-                            <span>
-                                <strong>Browser Only</strong>
-                                <small>Fast access, stored in browser</small>
-                            </span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="storagePreference" value="pc" id="storagePC">
-                            <span>
-                                <strong>PC Only</strong>
-                                <small>Save directly to PC files</small>
-                            </span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="storagePreference" value="both" id="storageBoth" checked>
-                            <span>
-                                <strong>Both (Recommended)</strong>
-                                <small>Browser + PC backup for safety</small>
-                            </span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="setting-group">
-                    <h3>Auto Backup Settings</h3>
-                    <label class="auto-backup-toggle">
-                        <input type="checkbox" id="autoBackupToggle" checked>
-                        <span>Enable Auto Backup to PC</span>
-                    </label>
-                    <div class="setting-detail">
-                        <label for="backupFrequency">Backup Frequency:</label>
-                        <select id="backupFrequency">
-                            <option value="immediate">Every Save (Immediate)</option>
-                            <option value="hourly" selected>Every Hour</option>
-                            <option value="daily">Once Daily</option>
-                            <option value="weekly">Once Weekly</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="setting-group">
-                    <h3>PC Storage Options</h3>
-                    <button class="btn btn-primary" id="chooseFolderBtn">📁 Choose Save Folder</button>
-                    <p class="setting-note" id="folderPath">Default: Downloads folder</p>
-                    <button class="btn btn-success" id="saveToPCNowBtn">💾 Save to PC Now</button>
-                </div>
-
-                <div class="setting-group">
-                    <h3>Current Storage Info</h3>
-                    <div class="storage-stats">
-                        <p><strong>Records:</strong> <span id="statsRecords">0</span></p>
-                        <p><strong>Browser Storage:</strong> <span id="statsBrowser">Active</span></p>
-                        <p><strong>PC Backup:</strong> <span id="statsPC">-</span></p>
-                        <p><strong>Total Size:</strong> <span id="statsSize">0 KB</span></p>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
-                    <button type="button" class="btn btn-secondary" id="cancelSettingsBtn">Cancel</button>
-                </div>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">✨ Trusted by thousands of professionals</div>
+        <h1 class="hero-title">
+          Organize Your Life with
+          <span class="gradient-text">Smart Record Management</span>
+        </h1>
+        <p class="hero-description">
+          The all-in-one platform to track, manage, and sync your daily records. 
+          Secure cloud storage, powerful analytics, and seamless collaboration.
+        </p>
+        <div class="hero-cta">
+          <a href="signup.html" class="btn-hero-primary">Start Free Trial</a>
+          <a href="#features" class="btn-hero-secondary">Learn More</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-number">10K+</div>
+            <div class="stat-label">Active Users</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">1M+</div>
+            <div class="stat-label">Records Managed</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">99.9%</div>
+            <div class="stat-label">Uptime</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <div class="card-header">
+            <div class="card-dots">
+              <span></span><span></span><span></span>
             </div>
+          </div>
+          <div class="card-content">
+            <div class="demo-record">
+              <div class="demo-record-header">
+                <span class="demo-badge">💼 Work</span>
+                <span class="demo-status completed">Completed</span>
+              </div>
+              <h3>Project Launch</h3>
+              <p>Successfully launched new product line</p>
+              <div class="demo-meta">📅 Today • ⭐ Priority</div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </section>
 
-    <!-- Edit Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Edit Record</h2>
-            <form id="editForm">
-                <input type="hidden" id="editId">
-                <div class="form-group">
-                    <label for="editDate">Date:</label>
-                    <input type="date" id="editDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="editTitle">Title:</label>
-                    <input type="text" id="editTitle" required>
-                </div>
-                <div class="form-group">
-                    <label for="editCategory">Category:</label>
-                    <select id="editCategory" required>
-                        <option value="work">Work</option>
-                        <option value="personal">Personal</option>
-                        <option value="health">Health</option>
-                        <option value="learning">Learning</option>
-                        <option value="project">Project</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="editDescription">Description:</label>
-                    <textarea id="editDescription" rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="editStatus">Status:</label>
-                    <select id="editStatus" required>
-                        <option value="pending">Pending</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Update Record</button>
-                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
-                </div>
-            </form>
+  <!-- Features Section -->
+  <section id="features" class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Powerful Features for Modern Teams</h2>
+        <p class="section-subtitle">Everything you need to stay organized and productive</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">☁️</div>
+          <h3>Cloud Sync</h3>
+          <p>Your data is automatically synced across all devices. Access your records anywhere, anytime.</p>
         </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Secure Storage</h3>
+          <p>Enterprise-grade security with end-to-end encryption. Your data is safe and private.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Smart Analytics</h3>
+          <p>Track your progress with detailed insights and visual analytics dashboard.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Advanced Search</h3>
+          <p>Find any record instantly with powerful search and filter capabilities.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📥</div>
+          <h3>Export & Import</h3>
+          <p>Export your data in multiple formats. Import from CSV, JSON, and more.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Lightning Fast</h3>
+          <p>Optimized for performance. Experience blazing-fast load times and smooth interactions.</p>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <script src="script.js"></script>
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">Get started in minutes</p>
+      </div>
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <h3>Sign Up</h3>
+          <p>Create your free account in seconds. No credit card required.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <h3>Add Records</h3>
+          <p>Start adding your daily records with categories and status tracking.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <h3>Stay Organized</h3>
+          <p>Use filters, search, and analytics to manage your records efficiently.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <p class="section-subtitle">Choose the plan that works for you</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>Free</h3>
+            <div class="pricing-price">
+              <span class="price-amount">$0</span>
+              <span class="price-period">/month</span>
+            </div>
+          </div>
+          <ul class="pricing-features">
+            <li>✓ Up to 100 records</li>
+            <li>✓ Basic categories</li>
+            <li>✓ Browser storage</li>
+            <li>✓ Export to CSV</li>
+          </ul>
+          <a href="signup.html" class="btn-pricing">Get Started</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Most Popular</div>
+          <div class="pricing-header">
+            <h3>Pro</h3>
+            <div class="pricing-price">
+              <span class="price-amount">$9</span>
+              <span class="price-period">/month</span>
+            </div>
+          </div>
+          <ul class="pricing-features">
+            <li>✓ Unlimited records</li>
+            <li>✓ All categories</li>
+            <li>✓ Cloud sync</li>
+            <li>✓ Advanced analytics</li>
+            <li>✓ Priority support</li>
+          </ul>
+          <a href="signup.html" class="btn-pricing primary">Start Free Trial</a>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>Enterprise</h3>
+            <div class="pricing-price">
+              <span class="price-amount">Custom</span>
+            </div>
+          </div>
+          <ul class="pricing-features">
+            <li>✓ Everything in Pro</li>
+            <li>✓ Team collaboration</li>
+            <li>✓ Custom integrations</li>
+            <li>✓ Dedicated support</li>
+            <li>✓ SLA guarantee</li>
+          </ul>
+          <a href="signup.html" class="btn-pricing">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Ready to Get Started?</h2>
+        <p>Join thousands of professionals who trust RecordFlow for their daily record management.</p>
+        <div class="cta-buttons">
+          <a href="signup.html" class="btn-cta-primary">Start Free Trial</a>
+          <a href="login.html" class="btn-cta-secondary">Login to Account</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="brand-icon">📊</span>
+          <span class="brand-name">RecordFlow</span>
+        </div>
+        <div class="footer-links">
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="login.html">Login</a>
+          <a href="signup.html">Sign Up</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 RecordFlow. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

@@ -1,6 +1,8 @@
 // Daily Record Manager - Professional Implementation
 
-class DailyRecordManager {
+import { supabase } from './supabaseClient.js';
+
+export default class DailyRecordManager {
     constructor() {
         this.records = this.loadRecords();
         this.editingId = null;
@@ -8,6 +10,7 @@ class DailyRecordManager {
         this.storagePreference = this.loadStoragePreference();
         this.backupFrequency = this.loadBackupFrequency();
         this.fileHandle = null; // For File System Access API
+        this.user = null;
         this.init();
     }
 
@@ -36,6 +39,11 @@ class DailyRecordManager {
         document.getElementById('saveToPCNowBtn').addEventListener('click', () => this.saveToPC());
         document.querySelector('.close').addEventListener('click', () => this.closeModal());
         document.querySelector('.close-storage').addEventListener('click', () => this.closeStorageSettings());
+        // Auth controls
+        const openAuthBtn = document.getElementById('openAuthBtn');
+        if (openAuthBtn) openAuthBtn.addEventListener('click', () => this.openAuthModal());
+        const signOutBtn = document.getElementById('signOutBtn');
+        if (signOutBtn) signOutBtn.addEventListener('click', () => this.signOut());
         
         // Update storage status
         this.updateStorageStatus();
@@ -53,6 +61,113 @@ class DailyRecordManager {
         });
 
         this.renderRecords();
+
+        // Initialize Supabase auth
+        this.initAuth();
+    }
+
+    async initAuth() {
+        try {
+            const { data } = await supabase.auth.getSession();
+            this.user = data.session?.user ?? null;
+            supabase.auth.onAuthStateChange((event, session) => {
+                this.user = session?.user ?? null;
+                this.updateAuthUI();
+                if (this.user) {
+                    // Pull user's records from Supabase and offer to merge/replace
+                    this.syncFromSupabase();
+                }
+            });
+            this.updateAuthUI();
+        } catch (err) {
+            console.error('Auth init error', err);
+        }
+    }
+
+    updateAuthUI() {
+        const signOutBtn = document.getElementById('signOutBtn');
+        const userEmail = document.getElementById('userEmail');
+        const openAuthBtn = document.getElementById('openAuthBtn');
+        if (this.user) {
+            if (signOutBtn) signOutBtn.style.display = 'inline-block';
+            if (openAuthBtn) openAuthBtn.style.display = 'none';
+            if (userEmail) userEmail.textContent = this.user.email;
+        } else {
+            if (signOutBtn) signOutBtn.style.display = 'none';
+            if (openAuthBtn) openAuthBtn.style.display = 'inline-block';
+            if (userEmail) userEmail.textContent = '';
+        }
+    }
+
+    openAuthModal() {
+        // Build a simple modal if not present
+        if (!document.getElementById('authModal')) {
+            const modal = document.createElement('div');
+            modal.id = 'authModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close-auth">&times;</span>
+                    <h2>Account</h2>
+                    <form id="authForm">
+                        <div class="form-group">
+                            <label for="authEmail">Email:</label>
+                            <input id="authEmail" type="email" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="authPassword">Password:</label>
+                            <input id="authPassword" type="password" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="authMode">Mode:</label>
+                            <select id="authMode">
+                                <option value="login">Login</option>
+                                <option value="signup">Sign up</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" type="submit">Continue</button>
+                        </div>
+                    </form>
+                </div>`;
+            document.body.appendChild(modal);
+            document.querySelector('#authModal .close-auth').addEventListener('click', () => modal.remove());
+            document.getElementById('authForm').addEventListener('submit', (e) => this.handleAuthForm(e));
+        }
+        document.getElementById('authModal').style.display = 'block';
+    }
+
+    async handleAuthForm(e) {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
+        const mode = document.getElementById('authMode').value;
+        try {
+            if (mode === 'signup') {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) throw error;
+                this.showNotification('Sign-up email sent (check inbox).', 'success');
+            } else {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                this.showNotification('Signed in successfully!', 'success');
+            }
+            document.getElementById('authModal').style.display = 'none';
+        } catch (err) {
+            console.error(err);
+            this.showNotification(err.message || 'Auth error', 'error');
+        }
+    }
+
+    async signOut() {
+        try {
+            await supabase.auth.signOut();
+            this.user = null;
+            this.updateAuthUI();
+            this.showNotification('Signed out.', 'success');
+        } catch (err) {
+            console.error('Sign out error', err);
+        }
     }
 
     handleSubmit(e) {
@@ -237,6 +352,52 @@ class DailyRecordManager {
         }
         
         this.updateStorageStatus();
+
+        // If user is signed in, sync to Supabase
+        if (this.user) {
+            this.saveToSupabase();
+        }
+    }
+
+    async saveToSupabase() {
+        if (!this.user) return;
+        try {
+            // prepare rows ensuring user_id present
+            const rows = this.records.map(r => ({ ...r, user_id: this.user.id }));
+            const { error } = await supabase.from('records').upsert(rows, { onConflict: 'id' });
+            if (error) console.error('Supabase upsert error', error);
+        } catch (err) {
+            console.error('Error saving to Supabase', err);
+        }
+    }
+
+    async syncFromSupabase() {
+        if (!this.user) return;
+        try {
+            const { data, error } = await supabase.from('records').select('*').eq('user_id', this.user.id);
+            if (error) {
+                console.error('Supabase fetch error', error);
+                return;
+            }
+            if (!data || data.length === 0) return;
+            const action = confirm(`Found ${data.length} records in your account. Click OK to MERGE, Cancel to REPLACE local records.`);
+            if (action) {
+                const existingIds = new Set(this.records.map(r => r.id));
+                const newRows = data.filter(d => !existingIds.has(d.id)).map(d => ({ id: d.id, date: d.date, title: d.title, category: d.category, description: d.description, status: d.status, createdAt: d.createdAt }));
+                this.records = [...this.records, ...newRows];
+                this.saveRecords();
+                this.renderRecords();
+                this.showNotification(`Merged ${newRows.length} records from cloud.`, 'success');
+            } else {
+                // Replace local
+                this.records = data.map(d => ({ id: d.id, date: d.date, title: d.title, category: d.category, description: d.description, status: d.status, createdAt: d.createdAt }));
+                this.saveRecords();
+                this.renderRecords();
+                this.showNotification(`Replaced local records with ${data.length} records from cloud.`, 'success');
+            }
+        } catch (err) {
+            console.error('Sync error', err);
+        }
     }
     
     autoBackupToPC() {
@@ -657,8 +818,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', () => {
-    new DailyRecordManager();
-});
+// Note: this module exports `DailyRecordManager` so the dashboard page
+// can instantiate it when appropriate (see `dashboard.js`).
 
