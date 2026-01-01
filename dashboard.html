@@ -9,12 +9,20 @@
 <body>
     <div class="container">
         <header>
-            <h1>📝 Daily Record Manager</h1>
-            <p class="subtitle">Your dashboard</p>
+            <div class="header-left">
+                <a href="index.html" class="dashboard-logo">
+                    <span class="brand-icon">📊</span>
+                    <span class="brand-name">RecordFlow</span>
+                </a>
+                <div class="header-title">
+                    <h1>Dashboard</h1>
+                    <p class="subtitle">Manage your daily records</p>
+                </div>
+            </div>
             <div class="auth-controls">
                 <button class="btn btn-small" id="openAuthBtn" style="display:none">🔐 Login / Sign up</button>
-                <button class="btn btn-small" id="signOutBtn" style="display:none">Sign out</button>
-                <span id="userEmail" style="margin-left:8px"></span>
+                <button class="btn btn-small btn-danger" id="signOutBtn" style="display:none">Sign out</button>
+                <span id="userEmail"></span>
             </div>
         </header>
 
