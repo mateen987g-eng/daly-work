@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Record Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Daily Record Manager</h1>
+            <p class="subtitle">Track your daily activities and progress</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Add Record Form -->
+            <section class="form-section">
+                <h2>Add New Record</h2>
+                <form id="recordForm">
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" placeholder="Enter record title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select id="category" required>
+                            <option value="">Select category</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="health">Health</option>
+                            <option value="learning">Learning</option>
+                            <option value="project">Project</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea id="description" rows="4" placeholder="Enter detailed description..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select id="status" required>
+                            <option value="pending">Pending</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Add Record</button>
+                        <button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Records Display -->
+            <section class="records-section">
+                <div class="section-header">
+                    <h2>Your Records</h2>
+                    <div class="storage-info">
+                        <span id="storageStatus">💾 Storage: Browser + PC Backup</span>
+                        <button class="btn btn-small btn-primary" id="storageSettingsBtn">⚙️ Storage Settings</button>
+                        <button class="btn btn-small btn-success" id="saveToPCBtn">💾 Save to PC Now</button>
+                    </div>
+                    <div class="filter-controls">
+                        <select id="filterCategory">
+                            <option value="">All Categories</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="health">Health</option>
+                            <option value="learning">Learning</option>
+                            <option value="project">Project</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <select id="filterStatus">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <button class="btn btn-small btn-success" id="exportBtn">📥 Export Data</button>
+                        <button class="btn btn-small btn-primary" id="importBtn">📤 Import Data</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                        <button class="btn btn-small" id="clearAllBtn">Clear All</button>
+                    </div>
+                </div>
+                
+                <div id="recordsList" class="records-list">
+                    <p class="empty-message">No records yet. Add your first record above!</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Storage Settings Modal -->
+    <div id="storageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-storage">&times;</span>
+            <h2>⚙️ Storage Settings</h2>
+            <div class="settings-content">
+                <div class="setting-group">
+                    <h3>Storage Preference</h3>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="storagePreference" value="browser" id="storageBrowser">
+                            <span>
+                                <strong>Browser Only</strong>
+                                <small>Fast access, stored in browser</small>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="storagePreference" value="pc" id="storagePC">
+                            <span>
+                                <strong>PC Only</strong>
+                                <small>Save directly to PC files</small>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="storagePreference" value="both" id="storageBoth" checked>
+                            <span>
+                                <strong>Both (Recommended)</strong>
+                                <small>Browser + PC backup for safety</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Auto Backup Settings</h3>
+                    <label class="auto-backup-toggle">
+                        <input type="checkbox" id="autoBackupToggle" checked>
+                        <span>Enable Auto Backup to PC</span>
+                    </label>
+                    <div class="setting-detail">
+                        <label for="backupFrequency">Backup Frequency:</label>
+                        <select id="backupFrequency">
+                            <option value="immediate">Every Save (Immediate)</option>
+                            <option value="hourly" selected>Every Hour</option>
+                            <option value="daily">Once Daily</option>
+                            <option value="weekly">Once Weekly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>PC Storage Options</h3>
+                    <button class="btn btn-primary" id="chooseFolderBtn">📁 Choose Save Folder</button>
+                    <p class="setting-note" id="folderPath">Default: Downloads folder</p>
+                    <button class="btn btn-success" id="saveToPCNowBtn">💾 Save to PC Now</button>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Current Storage Info</h3>
+                    <div class="storage-stats">
+                        <p><strong>Records:</strong> <span id="statsRecords">0</span></p>
+                        <p><strong>Browser Storage:</strong> <span id="statsBrowser">Active</span></p>
+                        <p><strong>PC Backup:</strong> <span id="statsPC">-</span></p>
+                        <p><strong>Total Size:</strong> <span id="statsSize">0 KB</span></p>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                    <button type="button" class="btn btn-secondary" id="cancelSettingsBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Record</h2>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editDate">Date:</label>
+                    <input type="date" id="editDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="editTitle">Title:</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">Category:</label>
+                    <select id="editCategory" required>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="health">Health</option>
+                        <option value="learning">Learning</option>
+                        <option value="project">Project</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Description:</label>
+                    <textarea id="editDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Status:</label>
+                    <select id="editStatus" required>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Update Record</button>
+                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

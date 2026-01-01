@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "exportDate": "2024-01-01T00:00:00.000Z",
+  "totalRecords": 3,
+  "records": [
+    {
+      "id": "1704067200000",
+      "date": "2024-01-01",
+      "title": "Sample Work Record",
+      "category": "work",
+      "description": "This is a sample work record. You can import this file to see how the data structure works.",
+      "status": "completed",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "1704153600000",
+      "date": "2024-01-02",
+      "title": "Sample Personal Record",
+      "category": "personal",
+      "description": "This is a sample personal record.",
+      "status": "in-progress",
+      "createdAt": "2024-01-02T00:00:00.000Z"
+    },
+    {
+      "id": "1704240000000",
+      "date": "2024-01-03",
+      "title": "Sample Learning Record",
+      "category": "learning",
+      "description": "This is a sample learning record.",
+      "status": "pending",
+      "createdAt": "2024-01-03T00:00:00.000Z"
+    }
+  ]
+}
+

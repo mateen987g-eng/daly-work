@@ -1,0 +1,4 @@
+id,date,title,category,description,status,createdAt,exportedAt
+1704067200000,2024-01-01,Sample Work Record,work,This is a sample work record. You can import this file to see how the data structure works.,completed,2024-01-01T00:00:00.000Z,2026-01-01T10:10:00.253620
+1704153600000,2024-01-02,Sample Personal Record,personal,This is a sample personal record.,in-progress,2024-01-02T00:00:00.000Z,2026-01-01T10:10:00.253620
+1704240000000,2024-01-03,Sample Learning Record,learning,This is a sample learning record.,pending,2024-01-03T00:00:00.000Z,2026-01-01T10:10:00.253620
