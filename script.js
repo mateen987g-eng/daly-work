@@ -264,6 +264,7 @@ export default class DailyRecordManager {
 
     renderRecords() {
         const recordsList = document.getElementById('recordsList');
+        const recordsCountEl = document.getElementById('recordsCount');
         const filterCategory = document.getElementById('filterCategory').value;
         const filterStatus = document.getElementById('filterStatus').value;
         
@@ -277,8 +278,20 @@ export default class DailyRecordManager {
             filteredRecords = filteredRecords.filter(r => r.status === filterStatus);
         }
         
+        // Update records count
+        if (recordsCountEl) {
+            const count = filteredRecords.length;
+            recordsCountEl.textContent = `${count} record${count !== 1 ? 's' : ''}`;
+        }
+        
         if (filteredRecords.length === 0) {
-            recordsList.innerHTML = '<p class="empty-message">No records found. Add your first record above!</p>';
+            recordsList.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <h3>No records found</h3>
+                    <p>${this.records.length === 0 ? 'Start by adding your first record above!' : 'Try adjusting your filters to see more records.'}</p>
+                </div>
+            `;
             return;
         }
         
@@ -286,15 +299,17 @@ export default class DailyRecordManager {
         
         // Add event listeners to action buttons
         filteredRecords.forEach(record => {
-            document.getElementById(`edit-${record.id}`).addEventListener('click', () => this.editRecord(record.id));
-            document.getElementById(`delete-${record.id}`).addEventListener('click', () => this.deleteRecord(record.id));
+            const editBtn = document.getElementById(`edit-${record.id}`);
+            const deleteBtn = document.getElementById(`delete-${record.id}`);
+            if (editBtn) editBtn.addEventListener('click', () => this.editRecord(record.id));
+            if (deleteBtn) deleteBtn.addEventListener('click', () => this.deleteRecord(record.id));
         });
     }
 
     createRecordCard(record) {
         const date = new Date(record.date).toLocaleDateString('en-US', { 
             year: 'numeric', 
-            month: 'long', 
+            month: 'short', 
             day: 'numeric' 
         });
         
@@ -306,23 +321,43 @@ export default class DailyRecordManager {
             project: '🚀 Project',
             other: '📋 Other'
         };
+
+        const statusIcons = {
+            'pending': '⏳',
+            'in-progress': '🔄',
+            'completed': '✅'
+        };
+
+        const statusLabels = {
+            'pending': 'Pending',
+            'in-progress': 'In Progress',
+            'completed': 'Completed'
+        };
         
         return `
-            <div class="record-card ${record.status}">
+            <div class="record-card ${record.status.replace(' ', '-')}" data-category="${record.category}">
                 <div class="record-header">
-                    <div>
+                    <div class="record-main-info">
                         <div class="record-title">${this.escapeHtml(record.title)}</div>
                         <div class="record-meta">
-                            <span>📅 ${date}</span>
+                            <span class="record-date">📅 ${date}</span>
                             <span class="category-badge">${categoryLabels[record.category] || record.category}</span>
-                            <span class="status-badge status-${record.status.replace('-', '-')}">${record.status.replace('-', ' ')}</span>
+                            <span class="status-badge status-${record.status.replace('-', '-')}">
+                                ${statusIcons[record.status] || ''} ${statusLabels[record.status] || record.status}
+                            </span>
                         </div>
                     </div>
                 </div>
                 <div class="record-description">${this.escapeHtml(record.description)}</div>
                 <div class="record-actions">
-                    <button class="btn btn-success btn-small" id="edit-${record.id}">Edit</button>
-                    <button class="btn btn-danger btn-small" id="delete-${record.id}">Delete</button>
+                    <button class="btn btn-success btn-small" id="edit-${record.id}">
+                        <span>✏️</span>
+                        <span>Edit</span>
+                    </button>
+                    <button class="btn btn-danger btn-small" id="delete-${record.id}">
+                        <span>🗑️</span>
+                        <span>Delete</span>
+                    </button>
                 </div>
             </div>
         `;

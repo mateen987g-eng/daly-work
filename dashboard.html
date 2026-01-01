@@ -77,38 +77,71 @@
 
             <!-- Records Display -->
             <section class="records-section">
-                <div class="section-header">
-                    <h2>Your Records</h2>
-                    <div class="storage-info">
-                        <span id="storageStatus">💾 Storage: Browser + PC Backup</span>
-                        <button class="btn btn-small btn-primary" id="storageSettingsBtn">⚙️ Storage Settings</button>
-                        <button class="btn btn-small btn-success" id="saveToPCBtn">💾 Save to PC Now</button>
+                <div class="records-section-header">
+                    <div class="records-header-top">
+                        <div class="records-title-group">
+                            <h2>Your Records</h2>
+                            <span class="records-count" id="recordsCount">0 records</span>
+                        </div>
+                        <div class="storage-info-modern">
+                            <span id="storageStatus" class="storage-badge">💾 Storage: Browser + PC Backup</span>
+                            <button class="btn-modern btn-icon" id="storageSettingsBtn" title="Storage Settings">
+                                <span>⚙️</span>
+                                <span>Settings</span>
+                            </button>
+                            <button class="btn-modern btn-icon btn-success-modern" id="saveToPCBtn" title="Save to PC">
+                                <span>💾</span>
+                                <span>Backup</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="filter-controls">
-                        <select id="filterCategory">
-                            <option value="">All Categories</option>
-                            <option value="work">Work</option>
-                            <option value="personal">Personal</option>
-                            <option value="health">Health</option>
-                            <option value="learning">Learning</option>
-                            <option value="project">Project</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <select id="filterStatus">
-                            <option value="">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                        <button class="btn btn-small btn-success" id="exportBtn">📥 Export Data</button>
-                        <button class="btn btn-small btn-primary" id="importBtn">📤 Import Data</button>
-                        <input type="file" id="importFile" accept=".json" style="display: none;">
-                        <button class="btn btn-small" id="clearAllBtn">Clear All</button>
+                    
+                    <div class="filter-controls-modern">
+                        <div class="filter-group">
+                            <label for="filterCategory">📂 Category</label>
+                            <select id="filterCategory" class="filter-select">
+                                <option value="">All Categories</option>
+                                <option value="work">💼 Work</option>
+                                <option value="personal">👤 Personal</option>
+                                <option value="health">🏥 Health</option>
+                                <option value="learning">📚 Learning</option>
+                                <option value="project">🚀 Project</option>
+                                <option value="other">📋 Other</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterStatus">📊 Status</label>
+                            <select id="filterStatus" class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="pending">⏳ Pending</option>
+                                <option value="in-progress">🔄 In Progress</option>
+                                <option value="completed">✅ Completed</option>
+                            </select>
+                        </div>
+                        <div class="filter-actions">
+                            <button class="btn-modern btn-export" id="exportBtn" title="Export Data">
+                                <span>📥</span>
+                                <span>Export</span>
+                            </button>
+                            <button class="btn-modern btn-import" id="importBtn" title="Import Data">
+                                <span>📤</span>
+                                <span>Import</span>
+                            </button>
+                            <input type="file" id="importFile" accept=".json" style="display: none;">
+                            <button class="btn-modern btn-danger-modern" id="clearAllBtn" title="Clear All Records">
+                                <span>🗑️</span>
+                                <span>Clear All</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <div id="recordsList" class="records-list">
-                    <p class="empty-message">No records yet. Add your first record above!</p>
+                <div id="recordsList" class="records-list-modern">
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>No records yet</h3>
+                        <p>Start by adding your first record above!</p>
+                    </div>
                 </div>
             </section>
         </div>
