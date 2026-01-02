@@ -119,9 +119,16 @@
         window.location.href = 'dashboard.html';
       } catch (error) {
         // Show error message
+        console.error('Login error:', error);
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
-        errorDiv.textContent = error.message || 'Login failed. Please check your credentials.';
+        // Provide more actionable message
+        errorDiv.innerHTML = `
+          ${error.message || 'Login failed. Please check your credentials.'}
+          <div style="margin-top:6px;font-size:0.9em;color:var(--muted);">
+            If you forgot your password, <a href="#" id="forgotLinkInline">reset it</a>.
+          </div>
+        `;
         
         // Remove existing error messages
         const existingError = form.querySelector('.error-message');
@@ -133,6 +140,23 @@
         btnLoader.style.display = 'none';
         btnText.textContent = 'Sign In';
         form.querySelector('.btn-auth-primary').disabled = false;
+      }
+    });
+
+    // Handle forgot password - open a prompt and send reset email
+    document.querySelector('.forgot-link').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const userEmail = document.getElementById('email').value || prompt('Enter your account email to reset password:');
+      if (!userEmail) return;
+      try {
+        const { data, error } = await supabase.auth.resetPasswordForEmail(userEmail, {
+          options: { emailRedirectTo: window.location.origin + '/login.html' }
+        });
+        if (error) throw error;
+        alert('Password reset email sent. Check your inbox.');
+      } catch (err) {
+        console.error('Reset password error', err);
+        alert(err.message || 'Could not send reset email.');
       }
     });
   </script>
