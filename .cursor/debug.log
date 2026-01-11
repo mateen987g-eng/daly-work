@@ -1,0 +1,10 @@
+{"location":"supabaseClient.js:1","message":"Module import start","data":{"timestamp":1768139163217},"timestamp":1768139163217,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"supabaseClient.js:14","message":"Supabase client created successfully","data":{"clientExists":true},"timestamp":1768139163223,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"signup.html:105","message":"Signup script module loading","data":{},"timestamp":1768139163223,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"signup.html:108","message":"Supabase import success in signup","data":{"supabaseExists":true},"timestamp":1768139163224,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"supabaseClient.js:5","message":"Module import success, creating client","data":{"url":"https://zapwmvochpxzbshvyvow.supabase.co","hasKey":true},"timestamp":1768139163218,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"supabaseClient.js:1","message":"Module import start","data":{"timestamp":1768139172838},"timestamp":1768139172838,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"supabaseClient.js:5","message":"Module import success, creating client","data":{"url":"https://zapwmvochpxzbshvyvow.supabase.co","hasKey":true},"timestamp":1768139172839,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"supabaseClient.js:14","message":"Supabase client created successfully","data":{"clientExists":true},"timestamp":1768139172840,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"signup.html:105","message":"Signup script module loading","data":{},"timestamp":1768139172840,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"signup.html:108","message":"Supabase import success in signup","data":{"supabaseExists":true},"timestamp":1768139172841,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
