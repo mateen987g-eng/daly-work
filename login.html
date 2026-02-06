@@ -17,8 +17,10 @@
           <span class="brand-icon">📊</span>
           <span class="brand-name">RecordFlow</span>
         </a>
-        <h1>Welcome Back</h1>
-        <p>Sign in to your account to continue</p>
+        <div class="welcome-content">
+          <h1>Welcome Back! 👋</h1>
+          <p>We're glad to see you again. Sign in to access your records and continue where you left off.</p>
+        </div>
       </div>
 
       <form id="loginForm" class="auth-form">
@@ -35,13 +37,18 @@
         
         <div class="form-group">
           <label for="password">Password</label>
-          <input 
-            id="password" 
-            type="password" 
-            placeholder="Enter your password" 
-            required 
-            autocomplete="current-password"
-          />
+          <div class="password-input-wrapper">
+            <input 
+              id="password" 
+              type="password" 
+              placeholder="Enter your password" 
+              required 
+              autocomplete="current-password"
+            />
+            <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+              <span class="toggle-icon">👁️</span>
+            </button>
+          </div>
         </div>
 
         <div class="form-options">
@@ -53,18 +60,25 @@
         </div>
 
         <button class="btn-auth-primary" type="submit">
-          <span>Sign In</span>
-          <span class="btn-loader" style="display: none;">⏳</span>
+          <span class="btn-text">Sign In</span>
+          <span class="btn-loader" style="display: none;">
+            <span class="spinner"></span>
+            <span>Signing in...</span>
+          </span>
         </button>
+        
+        <div class="quick-actions">
+          <a href="signup.html" class="quick-link">Don't have an account? <strong>Sign up</strong></a>
+        </div>
       </form>
 
-      <div class="auth-divider">
-        <span>or</span>
-      </div>
-
       <div class="auth-footer">
-        <p>Don't have an account? <a href="signup.html">Sign up for free</a></p>
-        <a href="index.html" class="back-link">← Back to home</a>
+        <div class="footer-links-group">
+          <a href="index.html" class="back-link">← Back to home</a>
+          <span class="footer-separator">•</span>
+          <a href="signup.html" class="footer-link">Create new account</a>
+        </div>
+        <p class="footer-note">By signing in, you agree to our Terms of Service and Privacy Policy</p>
       </div>
     </div>
 
@@ -94,16 +108,13 @@
     import { supabase } from './supabaseClient.js';
 
     const form = document.getElementById('loginForm');
-    const btnLoader = form.querySelector('.btn-loader');
-    const btnText = form.querySelector('.btn-auth-primary span:first-child');
+    const submitBtn = form.querySelector('.btn-auth-primary');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
       // Show loading state
-      btnLoader.style.display = 'inline-block';
-      btnText.textContent = 'Signing in...';
-      form.querySelector('.btn-auth-primary').disabled = true;
+      submitBtn.disabled = true;
 
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -122,16 +133,35 @@
         console.error('Login error:', error);
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
+        
         let errorMsg = error?.message || 'Login failed. Please check your credentials.';
-        if (errorMsg.includes('Failed to fetch') || errorMsg.includes('fetch')) {
-          errorMsg = 'Network error: Unable to connect to server. Please check your internet connection and try again.';
+        let errorTitle = 'Login Failed';
+        let showForgotPassword = true;
+        
+        // Handle specific error types
+        if (errorMsg.includes('Invalid login credentials') || errorMsg.includes('Invalid credentials')) {
+          errorTitle = 'Invalid Credentials';
+          errorMsg = 'The email or password you entered is incorrect. Please try again.';
+        } else if (errorMsg.includes('Failed to fetch') || errorMsg.includes('fetch')) {
+          errorTitle = 'Connection Error';
+          errorMsg = 'Unable to connect to server. Please check your internet connection and try again.';
+          showForgotPassword = false;
+        } else if (errorMsg.includes('Email not confirmed')) {
+          errorTitle = 'Email Not Verified';
+          errorMsg = 'Please verify your email address before signing in. Check your inbox for the verification link.';
         }
-        // Provide more actionable message
+        
         errorDiv.innerHTML = `
-          ${errorMsg}
-          <div style="margin-top:6px;font-size:0.9em;color:var(--muted);">
-            If you forgot your password, <a href="#" id="forgotLinkInline">reset it</a>.
+          <div class="error-header">
+            <span class="error-icon">⚠️</span>
+            <strong>${errorTitle}</strong>
           </div>
+          <div class="error-body">${errorMsg}</div>
+          ${showForgotPassword ? `
+            <div class="error-actions">
+              <a href="#" id="forgotLinkInline" class="error-link">Forgot your password? Reset it here</a>
+            </div>
+          ` : ''}
         `;
         
         // Remove existing error messages
@@ -140,29 +170,79 @@
         
         form.insertBefore(errorDiv, form.firstChild);
         
+        // Add shake animation
+        form.classList.add('shake');
+        setTimeout(() => form.classList.remove('shake'), 500);
+        
         // Reset button state
-        btnLoader.style.display = 'none';
-        btnText.textContent = 'Sign In';
-        form.querySelector('.btn-auth-primary').disabled = false;
+        submitBtn.disabled = false;
       }
     });
 
-    // Handle forgot password - open a prompt and send reset email
-    document.querySelector('.forgot-link').addEventListener('click', async (e) => {
+    // Password toggle functionality
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordInput = document.getElementById('password');
+    
+    if (passwordToggle) {
+      passwordToggle.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        passwordToggle.querySelector('.toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
+      });
+    }
+
+    // Handle forgot password
+    const handleForgotPassword = async (e) => {
       e.preventDefault();
-      const userEmail = document.getElementById('email').value || prompt('Enter your account email to reset password:');
-      if (!userEmail) return;
+      const userEmail = document.getElementById('email').value;
+      
+      if (!userEmail) {
+        const email = prompt('Enter your account email to reset password:');
+        if (!email) return;
+        await sendResetEmail(email);
+      } else {
+        await sendResetEmail(userEmail);
+      }
+    };
+    
+    const sendResetEmail = async (email) => {
       try {
-        const { data, error } = await supabase.auth.resetPasswordForEmail(userEmail, {
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
           options: { emailRedirectTo: window.location.origin + '/login.html' }
         });
         if (error) throw error;
-        alert('Password reset email sent. Check your inbox.');
+        
+        // Show success message
+        const successDiv = document.createElement('div');
+        successDiv.className = 'success-message';
+        successDiv.innerHTML = `
+          <div class="success-header">
+            <span class="success-icon">✅</span>
+            <strong>Reset Email Sent</strong>
+          </div>
+          <div class="success-body">Password reset instructions have been sent to ${email}. Please check your inbox.</div>
+        `;
+        
+        const existingError = form.querySelector('.error-message');
+        const existingSuccess = form.querySelector('.success-message');
+        if (existingError) existingError.remove();
+        if (existingSuccess) existingSuccess.remove();
+        
+        form.insertBefore(successDiv, form.firstChild);
+        
+        setTimeout(() => {
+          successDiv.style.opacity = '0';
+          setTimeout(() => successDiv.remove(), 300);
+        }, 5000);
       } catch (err) {
         console.error('Reset password error', err);
-        alert(err.message || 'Could not send reset email.');
+        alert(err.message || 'Could not send reset email. Please try again.');
       }
-    });
+    };
+    
+    // Attach forgot password handlers
+    document.querySelector('.forgot-link')?.addEventListener('click', handleForgotPassword);
+    document.getElementById('forgotLinkInline')?.addEventListener('click', handleForgotPassword);
   </script>
 </body>
 </html>
