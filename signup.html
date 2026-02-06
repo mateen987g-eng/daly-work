@@ -103,14 +103,7 @@
   </div>
 
   <script type="module">
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'signup.html:105',message:'Signup script module loading',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     import { supabase } from './supabaseClient.js';
-
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'signup.html:108',message:'Supabase import success in signup',data:{supabaseExists:!!supabase},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
 
     const form = document.getElementById('signupForm');
     const btnLoader = form.querySelector('.btn-loader');
@@ -141,10 +134,6 @@
 
       const email = document.getElementById('email').value;
       
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'signup.html:138',message:'Signup attempt starting',data:{email,hasPassword:!!password,supabaseExists:!!supabase},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
-      
       try {
         const { data, error } = await supabase.auth.signUp({ 
           email, 
@@ -153,10 +142,6 @@
             emailRedirectTo: window.location.origin + '/dashboard.html'
           }
         });
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'signup.html:150',message:'signUp response',data:{hasError:!!error,errorMessage:error?.message,hasData:!!data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-        // #endregion
         
         if (error) {
           throw error;
@@ -178,13 +163,15 @@
         }, 3000);
         
       } catch (error) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'signup.html:165',message:'Signup catch block',data:{errorMessage:error?.message,errorName:error?.name,errorStack:error?.stack?.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B,E'})}).catch(()=>{});
-        // #endregion
         // Show error message
+        console.error('Signup error:', error);
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
-        errorDiv.textContent = error.message || 'Sign up failed. Please try again.';
+        let errorMsg = error?.message || 'Sign up failed. Please try again.';
+        if (errorMsg.includes('Failed to fetch') || errorMsg.includes('fetch')) {
+          errorMsg = 'Network error: Unable to connect to server. Please check your internet connection and try again.';
+        }
+        errorDiv.textContent = errorMsg;
         
         const existingError = form.querySelector('.error-message');
         if (existingError) existingError.remove();

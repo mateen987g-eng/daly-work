@@ -91,14 +91,7 @@
   </div>
 
   <script type="module">
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'login.html:94',message:'Login script module loading',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     import { supabase } from './supabaseClient.js';
-
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'login.html:97',message:'Supabase import success in login',data:{supabaseExists:!!supabase},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
 
     const form = document.getElementById('loginForm');
     const btnLoader = form.querySelector('.btn-loader');
@@ -115,16 +108,8 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'login.html:115',message:'Login attempt starting',data:{email,hasPassword:!!password,supabaseExists:!!supabase},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
-      
       try {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'login.html:120',message:'signInWithPassword response',data:{hasError:!!error,errorMessage:error?.message,hasData:!!data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-        // #endregion
         
         if (error) {
           throw error;
@@ -133,16 +118,17 @@
         // Success - redirect to dashboard
         window.location.href = 'dashboard.html';
       } catch (error) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/a0098e94-79c2-4475-b6d2-f7e332a0273c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'login.html:129',message:'Login catch block',data:{errorMessage:error?.message,errorName:error?.name,errorStack:error?.stack?.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B,E'})}).catch(()=>{});
-        // #endregion
         // Show error message
         console.error('Login error:', error);
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
+        let errorMsg = error?.message || 'Login failed. Please check your credentials.';
+        if (errorMsg.includes('Failed to fetch') || errorMsg.includes('fetch')) {
+          errorMsg = 'Network error: Unable to connect to server. Please check your internet connection and try again.';
+        }
         // Provide more actionable message
         errorDiv.innerHTML = `
-          ${error.message || 'Login failed. Please check your credentials.'}
+          ${errorMsg}
           <div style="margin-top:6px;font-size:0.9em;color:var(--muted);">
             If you forgot your password, <a href="#" id="forgotLinkInline">reset it</a>.
           </div>
